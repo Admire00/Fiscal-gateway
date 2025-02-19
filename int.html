@@ -1,0 +1,390 @@
+
+    <style>
+        :root {
+            --primary-blue: #3669C9;
+            --secondary-blue: #4A80E4;
+            --primary-light: #F0F5FF;
+            --text-dark: #1A1F36;
+            --text-gray: #4A5568;
+            --gradient-start: #3669C9;
+            --gradient-end: #4A80E4;
+            --shadow-color: rgba(54, 105, 201, 0.1);
+        }
+
+        /* Rest of the styles remain the same, just updating colors */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            color: var(--text-dark);
+            background: #F8FAFC;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 2rem;
+        }
+
+        .integration-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .integration-modal.active {
+            display: block;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 31, 54, 0.7);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            z-index: 1001;
+            background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+            max-width: 600px;
+            width: 90%;
+            padding: 3rem;
+            border-radius: 2rem;
+            box-shadow: 
+                0 10px 25px rgba(54, 105, 201, 0.1),
+                0 40px 60px -20px rgba(54, 105, 201, 0.15);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .integration-modal.active .modal-content {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--primary-light);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            transform: rotate(90deg);
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .modal-icon {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            background: var(--primary-light);
+            box-shadow: 0 8px 16px var(--shadow-color);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-icon:hover {
+            transform: scale(1.05);
+        }
+
+        .modal-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .modal-description {
+            color: var(--text-gray);
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .modal-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .feature-tag {
+            font-size: 0.95rem;
+            padding: 0.6rem 1.4rem;
+            background: var(--primary-light);
+            color: var(--primary-blue);
+            border-radius: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .feature-tag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow-color);
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .modal-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .detail-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 8px 24px var(--shadow-color);
+            transition: transform 0.3s ease;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .detail-card h4 {
+            margin: 0 0 0.75rem 0;
+            color: var(--text-gray);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .setup-time {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+
+        .popularity-bar {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 0.75rem;
+        }
+
+        .popularity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            width: 75%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .modal-cta {
+            width: 100%;
+            padding: 1.4rem;
+            font-size: 1.15rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px var(--shadow-color);
+        }
+
+        .modal-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px var(--shadow-color);
+        }
+
+        .integration-card {
+            cursor: pointer;
+            padding: 2rem;
+            background: white;
+            border-radius: 1.5rem;
+            max-width: 320px;
+            box-shadow: 0 8px 24px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        .integration-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px var(--shadow-color);
+        }
+
+        .integration-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--primary-light);
+            padding: 1rem;
+        }
+
+        .integration-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .integration-card p {
+            color: var(--text-gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .integration-card .feature-tag {
+            margin-right: 0.75rem;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 2rem;
+            }
+
+            .modal-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .modal-details {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-title {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+    
+<body>
+    <!-- Demo integration card -->
+    <div class="integration-card">
+        <img src="/api/placeholder/80/80" alt="Integration Icon">
+        <h3>Integration Hub</h3>
+        <p>Connect and streamline your workflow with our powerful integration tools.</p>
+        <div class="feature-tag">Quick Setup</div>
+        <div class="feature-tag">Easy Config</div>
+    </div>
+
+    <!-- Modal HTML -->
+    <div class="integration-modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close">&times;</button>
+            <div class="modal-header">
+                <img class="modal-icon" src="/api/placeholder/90/90" alt="Integration Icon">
+                <h2 class="modal-title"></h2>
+            </div>
+            <p class="modal-description"></p>
+            <div class="modal-features"></div>
+            <div class="modal-details">
+                <div class="detail-card">
+                    <h4>⚡ Setup Time</h4>
+                    <p class="setup-time">15 minutes</p>
+                </div>
+                <div class="detail-card">
+                    <h4>📈 Popularity</h4>
+                    <div class="popularity-bar">
+                        <div class="popularity-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <button class="cta-button modal-cta">Start Integration</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.querySelector('.integration-modal');
+            const modalContent = modal.querySelector('.modal-content');
+            const cards = document.querySelectorAll('.integration-card, .integration-item');
+
+            function openModal(card) {
+                const title = card.querySelector('h3').textContent;
+                const description = card.querySelector('p').textContent;
+                const features = Array.from(card.querySelectorAll('.feature-tag')).map(tag => tag.textContent);
+                const imgSrc = card.querySelector('img')?.src;
+
+                modal.querySelector('.modal-title').textContent = title;
+                modal.querySelector('.modal-description').textContent = description;
+                
+                if (imgSrc) {
+                    modal.querySelector('.modal-icon').src = imgSrc;
+                }
+
+                const featuresContainer = modal.querySelector('.modal-features');
+                featuresContainer.innerHTML = features
+                    .map(feature => `<span class="feature-tag">${feature}</span>`)
+                    .join('');
+
+                modal.querySelector('.setup-time').textContent = `${Math.floor(Math.random() * 10) + 5} minutes`;
+                modal.querySelector('.popularity-fill').style.width = `${Math.floor(Math.random() * 60) + 40}%`;
+
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            cards.forEach(card => {
+                card.addEventListener('click', () => openModal(card));
+            });
+
+            modal.querySelector('.modal-close').addEventListener('click', closeModal);
+            modal.querySelector('.modal-overlay').addEventListener('click', closeModal);
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            modalContent.addEventListener('click', (e) => e.stopPropagation());
+        });
+    </script>
+</body>
+</html>

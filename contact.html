@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Fiscal Gateway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <style>
+        :root {
+            --primary-blue: #3669C9;
+            --primary-light: #EBF2FF;
+            --secondary-blue: #5A8AE4;
+            --secondary-green: #67B82D;
+            --text-dark: #1A202C;
+            --text-gray: #4A5568;
+            --background-light: #F7FAFC;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4fc 0%, #f5fbf0 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 500px;
+            background: linear-gradient(135deg, var(--primary-blue), #5A8AE4);
+            clip-path: polygon(0 0, 100% 0, 100% 60%, 0% 100%);
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+            
+        }
+
+        .contact-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            color: white;
+        }
+
+        .contact-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .contact-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .contact-wrapper {
+            display: flex;
+            gap: 4rem;
+            align-items: stretch;
+            margin-top: 2rem;
+        }
+
+        .footer {
+            background: var(--primary-blue);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 1rem 1rem 0 0;
+            margin-top: 4rem;
+            background: linear-gradient(135deg, var(--primary-blue), #5A8AE4);
+        }
+
+        @media (max-width: 968px) {
+            .contact-wrapper {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+
+            .contact-header h1 {
+                font-size: 2.5rem;
+            }
+
+            body::before {
+                height: 400px;
+            }
+        }
+
+        /* Animation classes */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .contact-info, .contact-form {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .contact-form {
+            animation-delay: 0.2s;
+        }
+
+        .map-section {
+            margin: 4rem auto;
+            max-width: 1300px;
+            padding: 3rem;
+            background: linear-gradient(135deg, #fff, var(--primary-light));
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .map-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-light);
+            gap: 1rem;
+        }
+
+        .map-heading {
+            color: var(--text-dark);
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 3px solid white;
+            transition: all 0.3s ease;
+        }
+
+        .map-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .map-button {
+            background: white;
+            border: 2px solid var(--primary-light);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary-blue);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .map-button:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .map-button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .map-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            box-shadow: var(--shadow-lg);
+            max-width: 300px;
+            border: 2px solid var(--primary-light);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .map-info.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .map-info h3 {
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .map-info p {
+            color: var(--text-gray);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--primary-light);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .custom-marker {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .map-section {
+                margin: 2rem 1rem;
+                padding: 1.5rem;
+            }
+
+            .map-container {
+                height: 400px;
+            }
+
+            .map-controls {
+                flex-direction: row;
+                bottom: 1rem;
+                top: auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .map-info {
+                position: relative;
+                top: 0;
+                right: 0;
+                max-width: 100%;
+                margin-top: 1rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+   
+  <header class="header">
+    <div class="header-content">
+        <a href="#" class="logo">
+            <svg viewBox="0 0 200 150">
+                <path d="M100 30 C60 30, 30 60, 30 100" fill="white" />
+                <path d="M100 30 C140 30, 170 60, 170 100" fill="#67B82D" />
+            </svg>
+            <span class="logo-text">Fiscal Gateway</span>
+        </a>
+        <button class="mobile-menu-button" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="services.html">Services</a>
+            <a href="integrations.html">Integrations</a>
+            <a href="pricing.html">Pricing</a>
+            <a href="contact.html">Contact</a>
+            <a href="signup.html">Signup</a>
+            <a href="login.html">Login</a>
+        </nav>
+    </div>
+</header>
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.header {
+    background: #3669C9;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    z-index: 1002;
+}
+
+.logo svg {
+    width: 40px;
+    height: 40px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-menu-button {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1002;
+    position: relative;
+}
+
+.mobile-menu-button span {
+    width: 100%;
+    height: 3px;
+    background-color: white;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+}
+
+.nav-links a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+
+/* Tablet Styles */
+@media (max-width: 1024px) {
+    .header-content {
+        padding: 1rem;
+    }
+    
+    .nav-links {
+        gap: 1rem;
+    }
+    
+    .nav-links a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+    .mobile-menu-button {
+        display: flex;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        width: 300px;
+        background: #3669C9;
+        flex-direction: column;
+        padding: 5rem 2rem 2rem;
+        transition: all 0.3s ease;
+        gap: 1.5rem;
+        z-index: 1001;
+    }
+
+    .nav-links.active {
+        right: 0;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links a {
+        width: 100%;
+        text-align: center;
+        padding: 0.75rem;
+        font-size: 1.1rem;
+    }
+
+    .mobile-menu-button.active span:first-child {
+        transform: translateY(9px) rotate(45deg);
+    }
+
+    .mobile-menu-button.active span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .mobile-menu-button.active span:last-child {
+        transform: translateY(-9px) rotate(-45deg);
+    }
+
+    body.menu-open {
+        overflow: hidden;
+    }
+}
+
+/* Small Mobile Styles */
+@media (max-width: 480px) {
+    .logo svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    .logo-text {
+        font-size: 1.1rem;
+    }
+
+    .header-content {
+        padding: 0.75rem 1rem;
+    }
+    
+    .nav-links {
+        width: 250px;
+        padding: 4rem 1.5rem 2rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const navLinks = document.querySelector('.nav-links');
+    const body = document.body;
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-menu-overlay';
+    document.body.appendChild(overlay);
+
+    function toggleMenu() {
+        mobileMenuButton.classList.toggle('active');
+        navLinks.classList.toggle('active');
+        overlay.classList.toggle('active');
+        body.classList.toggle('menu-open');
+    }
+
+    mobileMenuButton.addEventListener('click', function(event) {
+        event.stopPropagation();
+        toggleMenu();
+    });
+
+    // Close menu when clicking on a link
+    const navLinksItems = document.querySelectorAll('.nav-links a');
+    navLinksItems.forEach(link => {
+        link.addEventListener('click', () => {
+            toggleMenu();
+        });
+    });
+
+    // Close menu when clicking overlay
+    overlay.addEventListener('click', () => {
+        toggleMenu();
+    });
+
+    // Handle escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && navLinks.classList.contains('active')) {
+            toggleMenu();
+        }
+    });
+
+    // Prevent clicks inside nav-links from closing the menu
+    navLinks.addEventListener('click', function(event) {
+        event.stopPropagation();
+    });
+});
+</script>
+
+
+
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+
+      .container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 1;
+        padding-top: 100px; /* Add padding to account for the fixed header */
+    }
+    
+    .contact-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        color: white;
+        margin-top: 2rem; /* Optional: Add margin-top for extra spacing */
+    }
+
+        .contact-header h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .contact-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .contact-wrapper {
+            display: flex;
+            gap: 4rem;
+            align-items: stretch;
+            margin-top: 2rem;
+        }
+
+        .contact-info {
+            flex: 1;
+            background: white;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgba(54, 105, 201, 0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, #ffffff, #f0f4fc);
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            color: var(--text-gray);
+            transition: all 0.3s ease;
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+
+        .info-item:hover {
+            background: var(--background-light);
+            transform: translateX(10px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .info-item i {
+            font-size: 24px;
+            margin-right: 1.5rem;
+            color: var(--primary-blue);
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover i {
+            color: var(--secondary-blue);
+            transform: scale(1.1);
+        }
+
+        .contact-form {
+          background: white;
+          padding: 3rem;
+          border-radius: 1.5rem;
+          box-shadow: 0 25px 50px -12px rgba(54, 105, 201, 0.15);
+      }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 1.2rem;
+          border: 2px solid #E2E8F0;
+          background: #f8fafc;
+          border-radius: 1rem;
+          color: #1a202c;
+          font-size: 1rem;
+          transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+          outline: none;
+          border-color: #3669C9;
+          background: white;
+          box-shadow: 0 0 0 4px rgba(54, 105, 201, 0.1);
+      }
+
+      .form-control::placeholder {
+          color: #64748b;
+          opacity: 1;
+          font-weight: 500;
+      }
+
+      textarea.form-control {
+          height: 150px;
+          resize: vertical;
+      }
+
+      .form-label {
+          position: absolute;
+          left: 1rem;
+          top: -0.5rem;
+          padding: 0 0.5rem;
+          background: white;
+          color: #3669C9;
+          font-size: 0.875rem;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          pointer-events: none;
+      }
+
+        input, textarea {
+            width: 100%;
+            padding: 1.2rem;
+            border: 2px solid #E2E8F0;
+            background: white;
+            border-radius: 1rem;
+            color: var(--text-dark);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(54, 105, 201, 0.1);
+            background: white;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #A0AEC0;
+            opacity: 1; /* Ensure full visibility */
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary-blue), #5A8AE4);
+            color: white;
+            border: none;
+            padding: 1.2rem 2rem;
+            border-radius: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -15px rgba(54, 105, 201, 0.4);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-links a {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: var(--secondary-blue);
+            transform: translateY(-5px);
+        }
+
+        @media (max-width: 968px) {
+            .contact-wrapper {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+
+            .contact-header h1 {
+                font-size: 2.5rem;
+            }
+
+            body::before {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="contact-header">
+            <h1>Running a business should allow you to<br>focus on what you love.</h1>
+            <p>Get in touch with us!</p>
+        </div>
+        
+        <div class="contact-wrapper">
+            <div class="contact-info">
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>110 L.Takawira Street, Construction House, 5th Floor, Harare, Zimbabwe</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>info@gca.co.zw</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <span>+263 242787 983 <br> +263 774 763 667 <br> +263 712 381 965</span>
+                </div>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <form class="contact-form">
+              <div class="form-row">
+                  <div class="form-group">
+                      <input type="text" placeholder="Name & Surname" required>
+                  </div>
+                  <div class="form-group">
+                      <input type="text" placeholder="Company Name" required>
+                  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group">
+                      <input type="email" placeholder="Email Address" required>
+                  </div>
+                  <div class="form-group">
+                      <input type="tel" placeholder="Phone Number" required>
+                  </div>
+              </div>
+              <div class="form-group">
+                  <textarea placeholder="Message" required></textarea>
+              </div>
+              <button type="submit">Submit</button>
+          </form>
+        </div>
+    </div>
+
+
+
+
+        
+
+    <!-- New Map Section -->
+    <section class="map-section">
+        <div class="map-header">
+            <svg viewBox="0 0 24 24" width="32" height="32">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="url(#gradient)"/>
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3669C9"/>
+                        <stop offset="100%" style="stop-color:#5A8AE4"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <h2 class="map-heading">Visit Our Office</h2>
+        </div>
+        <div class="map-container" id="map">
+            <div class="map-controls">
+                <button class="map-button" id="zoomIn">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    Zoom In
+                </button>
+                <button class="map-button" id="zoomOut">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 13H5v-2h14v2z"/>
+                    </svg>
+                    Zoom Out
+                </button>
+                <button class="map-button" id="toggleInfo">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    Info
+                </button>
+            </div>
+            <div class="map-info" id="mapInfo">
+                <h3>Fiscal Gateway</h3>
+                <p>110 L.Takawira Street, Construction House, 5th Floor, Harare, Zimbabwe</p>
+            </div>
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </section>
+  
+    <!-- Add Leaflet JS and initialization script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Constants
+            const OFFICE_LOCATION = [-17.830624252820023, 31.045015777758554];
+            const DEFAULT_ZOOM = 16;
+            const MAX_ZOOM = 19;
+            const MIN_ZOOM = 14;
+
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const mapInfo = document.getElementById('mapInfo');
+            
+            loadingOverlay.classList.add('visible');
+
+            // Add required style for the map container
+            document.getElementById('map').style.height = '500px';
+
+            // Initialize map with error handling
+            try {
+                const map = L.map('map', {
+                    center: OFFICE_LOCATION,
+                    zoom: DEFAULT_ZOOM,
+                    zoomControl: false
+                });
+
+                // Add tile layer with error handling
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Custom marker icon
+                const customIcon = L.divIcon({
+                    html: `
+                        <svg viewBox="0 0 24 24" width="32" height="32" class="custom-marker">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" 
+                                  fill="#3669C9"/>
+                        </svg>`,
+                    className: 'custom-marker-container',
+                    iconSize: [32, 32],
+                    iconAnchor: [16, 32]
+                });
+
+                // Add marker
+                const marker = L.marker(OFFICE_LOCATION, {
+                    icon: customIcon
+                }).addTo(map);
+
+                // Event Listeners
+                document.getElementById('zoomIn').addEventListener('click', () => {
+                    map.zoomIn({ animate: true });
+                });
+
+                document.getElementById('zoomOut').addEventListener('click', () => {
+                    map.zoomOut({ animate: true });
+                });
+
+                document.getElementById('toggleInfo').addEventListener('click', () => {
+                    mapInfo.classList.toggle('visible');
+                });
+
+                // Marker interactions
+                marker.on('click', () => {
+                    map.flyTo(marker.getLatLng(), DEFAULT_ZOOM + 1, {
+                        duration: 1
+                    });
+                    mapInfo.classList.add('visible');
+                });
+
+                // Hide loading overlay when map is ready
+                map.whenReady(() => {
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('visible');
+                        mapInfo.classList.add('visible');
+                    }, 800);
+                });
+
+            } catch (error) {
+                console.error('Map initialization error:', error);
+                loadingOverlay.innerHTML = '<p>Error loading map. Please refresh the page.</p>';
+            }
+        });
+    </script>
+
+
+     
+<div class="footer-section">
+    <!-- Background Pattern -->
+    <div class="footer-background"></div>
+  
+    <div class="footer-grid">
+      <!-- About Us Section -->
+      <div class="footer-column">
+        <h3 class="footer-heading">About us</h3>
+        <p class="footer-text">Fiscal Gateway is a leading provider of financial solutions and technical services, empowering modern businesses to achieve their financial goals.</p>
+        <div class="newsletter-box">
+          <input type="email" placeholder="Enter Your Email" class="footer-input">
+          <button class="footer-button">Subscribe to Newsletter</button>
+        </div>
+      </div>
+  
+      <!-- Fiscal Portal Section -->
+      <div class="footer-column">
+        <h3 class="footer-heading">Fiscal Portal</h3>
+        <div class="portal-links">
+          <a href="#" class="portal-link">
+            <span class="portal-icon">🔔</span>
+            <div class="portal-text">
+              <div class="portal-title">Alerts</div>
+              <div class="portal-subtitle">Stay updated with notifications</div>
+            </div>
+          </a>
+          <a href="#" class="portal-link">
+            <span class="portal-icon">📰</span>
+            <div class="portal-text">
+              <div class="portal-title">News</div>
+              <div class="portal-subtitle">Latest financial updates</div>
+            </div>
+          </a>
+          <a href="#" class="portal-link">
+            <span class="portal-icon">📑</span>
+            <div class="portal-text">
+              <div class="portal-title">Documents</div>
+              <div class="portal-subtitle">Access important files</div>
+            </div>
+          </a>
+        </div>
+      </div>
+  
+      <!-- Latest Updates Section -->
+      <div class="footer-column">
+        <h3 class="footer-heading">Latest updates</h3>
+        <div class="updates-box">
+          <div class="updates-header">
+            <div class="updates-title">@FiscalGateway</div>
+            <div class="updates-subtitle">Follow us for updates</div>
+          </div>
+          <div class="updates-content">
+            Stay connected with our latest news and updates
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      <p>© 2025 Fiscal Gateway. All Rights Reserved.</p>
+    </div>
+  
+    <style>
+      .footer-section {
+        background: linear-gradient(135deg, #3669C9, #5A8AE4);
+        color: white;
+        padding: 6rem 0 4rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        position: relative;
+        overflow: hidden;
+      }
+  
+      .footer-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 100% 100%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                          radial-gradient(circle at 0% 0%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        opacity: 0.6;
+      }
+  
+      .footer-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4rem;
+        position: relative;
+        z-index: 1;
+      }
+  
+      .footer-column {
+        animation: fadeIn 0.8s ease-out;
+      }
+  
+      .footer-heading {
+        font-size: 1.75rem;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fff, #e0e7ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+  
+      .footer-text {
+        line-height: 1.8;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.9);
+      }
+  
+      .newsletter-box {
+        background: rgba(255,255,255,0.1);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: transform 0.3s ease;
+      }
+  
+      .newsletter-box:hover {
+        transform: translateY(-5px);
+      }
+  
+      .footer-input {
+        padding: 1rem;
+        border-radius: 0.75rem;
+        border: 2px solid rgba(255,255,255,0.2);
+        width: 100%;
+        margin-bottom: 1rem;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+  
+      .footer-input:hover {
+        border-color: rgba(255,255,255,0.4);
+      }
+  
+      .footer-button {
+        background: #67B82D;
+        color: white;
+        padding: 1rem;
+        border: none;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(103, 184, 45, 0.3);
+      }
+  
+      .footer-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(103, 184, 45, 0.4);
+      }
+  
+      .portal-links {
+        display: grid;
+        gap: 1.25rem;
+      }
+  
+      .portal-link {
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255,255,255,0.1);
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+  
+      .portal-link:hover {
+        transform: translateX(10px);
+        background: rgba(255,255,255,0.2);
+      }
+  
+      .portal-icon {
+        background: rgba(255,255,255,0.15);
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 1.25rem;
+      }
+  
+      .portal-title {
+        font-weight: 600;
+      }
+  
+      .portal-subtitle {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+  
+      .updates-box {
+        background: rgba(255,255,255,0.1);
+        padding: 1.5rem;
+        border-radius: 1rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        height: 100%;
+        min-height: 200px;
+      }
+  
+      .updates-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+        margin-bottom: 1rem;
+      }
+  
+      .updates-title {
+        font-weight: 600;
+      }
+  
+      .updates-subtitle {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+  
+      .updates-content {
+        padding: 1rem;
+        background: rgba(255,255,255,0.05);
+        border-radius: 0.75rem;
+        margin-top: 1rem;
+      }
+  
+      .footer-bottom {
+        max-width: 1200px;
+        margin: 4rem auto 0;
+        padding: 2rem 2rem 0;
+        border-top: 1px solid rgba(255,255,255,0.1);
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+  
+      .footer-bottom p {
+        font-size: 1.1rem;
+        color: rgba(255,255,255,0.8);
+      }
+  
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+  
+      input::placeholder {
+        color: rgba(255,255,255,0.6);
+      }
+  
+      /* Tablet Styles */
+      @media (max-width: 1024px) {
+        .footer-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 3rem;
+          padding: 0 1.5rem;
+        }
+  
+        .footer-heading {
+          font-size: 1.5rem;
+        }
+  
+        .footer-text {
+          font-size: 1rem;
+        }
+      }
+  
+      /* Small Tablet Styles */
+      @media (max-width: 768px) {
+        .footer-section {
+          padding: 4rem 0 3rem;
+        }
+  
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
+        }
+  
+        .newsletter-box,
+        .updates-box {
+          padding: 1.25rem;
+        }
+  
+        .portal-link:hover {
+          transform: translateX(5px);
+        }
+      }
+  
+      /* Mobile Styles */
+      @media (max-width: 480px) {
+        .footer-section {
+          padding: 3rem 0 2rem;
+        }
+  
+        .footer-grid {
+          padding: 0 1rem;
+          gap: 2rem;
+        }
+  
+        .footer-heading {
+          font-size: 1.25rem;
+          margin-bottom: 1rem;
+        }
+  
+        .footer-text {
+          font-size: 0.95rem;
+          margin-bottom: 1.5rem;
+        }
+  
+        .footer-input,
+        .footer-button {
+          padding: 0.875rem;
+          font-size: 0.95rem;
+        }
+  
+        .portal-link {
+          padding: 0.875rem;
+        }
+  
+        .portal-icon {
+          padding: 0.5rem;
+          font-size: 1rem;
+        }
+  
+        .portal-subtitle {
+          font-size: 0.85rem;
+        }
+  
+        .footer-bottom {
+          margin-top: 3rem;
+          padding: 1.5rem 1rem 0;
+        }
+  
+        .footer-bottom p {
+          font-size: 0.95rem;
+        }
+      }
+    </style>
+  </div> 
+  
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    input::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+    
+    @media (max-width: 968px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+  </style>
+  </div>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  input::placeholder {
+    color: rgba(255,255,255,0.6);
+  }
+  
+  @media (max-width: 968px) {
+    .container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+</style>
+</div>
+
+
+</body>
+</html>
